@@ -1,0 +1,19 @@
+{% comment %}
+  Reusable Empty State Component
+  Usage: {% include "components/empty_state.html" with icon="bi-journal-x" title="لا توجد مقررات" description="لم يتم التسجيل في أي مقرر بعد." action_url="/courses/" action_text="تصفح المقررات" %}
+{% endcomment %}
+<div class="empty-state">
+  <div class="empty-state-icon">
+    <i class="bi {{ icon|default:'bi-inbox' }}"></i>
+  </div>
+  <h3 class="empty-state-title">{{ title|default:'لا توجد بيانات متاحة' }}</h3>
+  {% if description %}
+    <p class="empty-state-description">{{ description }}</p>
+  {% endif %}
+  {% if action_url and action_text %}
+    <a href="{{ action_url }}" class="btn btn-primary">
+      <i class="bi bi-arrow-left"></i>
+      <span>{{ action_text }}</span>
+    </a>
+  {% endif %}
+</div>

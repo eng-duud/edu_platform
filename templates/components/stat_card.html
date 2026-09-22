@@ -1,0 +1,13 @@
+{% comment %}
+  Reusable Stat Card Component
+  Usage: {% include "components/stat_card.html" with title="مقرراتي" value=3 icon="bi-journal-bookmark" color_class="primary" %}
+{% endcomment %}
+<div class="stat-card">
+  <div class="stat-icon-wrapper stat-icon-{{ color_class|default:'primary' }}">
+    <i class="bi {{ icon|default:'bi-graph-up' }}"></i>
+  </div>
+  <div class="stat-details">
+    <span class="stat-value">{{ value|default:'0' }}</span>
+    <span class="stat-label">{{ title }}</span>
+  </div>
+</div>

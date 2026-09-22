@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}إدارة {{ course.name }} - منصة التعليم الجامعية{% endblock %}
+
+{% block breadcrumb %}
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <a href="{% url 'doctor_courses' %}" class="text-muted">موادي</a>
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <span class="page-breadcrumb-item active">{{ course.name }}</span>
+{% endblock %}
+
+{% block content %}
+  <!-- Course Management Header Card -->
+  <div class="card mb-4">
+    <div class="card-body" style="padding: 2rem;">
+      <div class="d-flex align-items-start justify-content-between" style="flex-wrap: wrap; gap: 1.5rem;">
+        <div>
+          <div class="course-card-tags mb-2">
+            {% if course.specialization %}
+              <span class="badge badge-primary">{{ course.specialization.name|default:course.specialization }}</span>
+            {% endif %}
+            {% if course.level %}
+              <span class="badge badge-neutral">{{ course.level.name|default:course.level }}</span>
+            {% endif %}
+          </div>
+          <h1 class="page-title" style="margin-bottom: 0.5rem;">{{ course.name }}</h1>
+          <div class="course-meta-row" style="margin: 0;">
+            <div class="course-meta-item">
+              <i class="bi bi-person-fill text-muted"></i>
+              <span>الأستاذ المشرف: <strong>د. {{ course.doctor.user.get_full_name|default:course.doctor.full_name|default:user.get_full_name|default:user.username }}</strong></span>
+            </div>
+            <div class="course-meta-item">
+              <i class="bi bi-people text-muted"></i>
+              <span>{{ course.enrollments.count|default:course.students_count|default:'0' }} طالب مسجل</span>
+            </div>
+            <div class="course-meta-item">
+              <i class="bi bi-collection-play text-muted"></i>
+              <span>{{ lectures.count|default:course.lectures.count|default:'0' }} محاضرة</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <a href="{% url 'doctor_lecture_add' course.id %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i>
+            <span>إضافة محاضرة جديدة</span>
+          </a>
+        </div>
+      </div>
+
+      {% if course.description %}
+        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color-subtle);">
+          <h3 style="font-size: var(--font-size-md); font-weight: var(--font-weight-semibold); margin-bottom: 0.5rem;">توصيف المقرر</h3>
+          <p class="text-body" style="line-height: var(--line-height-relaxed); margin: 0;">
+            {{ course.description }}
+          </p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Lectures List Section -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h2 style="font-size: var(--font-size-xl); margin: 0;">قائمة محاضرات المقرر</h2>
+      <p class="text-muted text-small m-0">يمكنك تعديل محتوى المحاضرة، تحديث الملفات أو حذفها</p>
+    </div>
+  </div>
+
+  {% if lectures or course.lectures.all %}
+    <div class="lecture-list">
+      {% for lecture in lectures|default:course.lectures.all %}
+        {% include "components/lecture_item.html" with lecture=lecture course_id=course.id is_doctor=True %}
+      {% endfor %}
+    </div>
+  {% else %}
+    {% url 'doctor_lecture_add' course.id as add_lecture_url %}
+    {% include "components/empty_state.html" with icon="bi-collection-play" title="لم تتم إضافة أي محاضرات لهذا المقرر بعد" description="ابدأ بإضافة أول محاضرة ورفع الملفات التعليمية أو الفيديوهات لطلابك." action_url=add_lecture_url action_text="إضافة أول محاضرة" %}
+  {% endif %}
+
+{% endblock %}

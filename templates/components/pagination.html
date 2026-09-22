@@ -1,0 +1,47 @@
+{% comment %}
+  Reusable Pagination Component
+  Parameters:
+    - page_obj: Django Paginator Page object
+{% endcomment %}
+{% if page_obj.has_other_pages %}
+  <nav class="d-flex justify-content-center mt-4" aria-label="تنقل الصفحات">
+    <div class="d-flex align-items-center gap-1">
+      
+      <!-- Previous Page -->
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="btn btn-secondary btn-sm" aria-label="السابق">
+          <i class="bi bi-chevron-right"></i>
+          <span>السابق</span>
+        </a>
+      {% else %}
+        <button class="btn btn-secondary btn-sm" disabled aria-label="السابق">
+          <i class="bi bi-chevron-right"></i>
+          <span>السابق</span>
+        </button>
+      {% endif %}
+
+      <!-- Page Numbers -->
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <span class="btn btn-primary btn-sm disabled" aria-current="page">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="btn btn-secondary btn-sm">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      <!-- Next Page -->
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="btn btn-secondary btn-sm" aria-label="التالي">
+          <span>التالي</span>
+          <i class="bi bi-chevron-left"></i>
+        </a>
+      {% else %}
+        <button class="btn btn-secondary btn-sm" disabled aria-label="التالي">
+          <span>التالي</span>
+          <i class="bi bi-chevron-left"></i>
+        </button>
+      {% endif %}
+
+    </div>
+  </nav>
+{% endif %}

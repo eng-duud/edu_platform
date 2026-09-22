@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}الملف الشخصي لعضو هيئة التدريس - منصة التعليم الجامعية{% endblock %}
+
+{% block breadcrumb %}
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <span class="page-breadcrumb-item active">الملف الشخصي لعضو هيئة التدريس</span>
+{% endblock %}
+
+{% block content %}
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title-group">
+      <h1 class="page-title">الملف الشخصي والأكاديمي</h1>
+      <p class="page-subtitle">البيانات الأكاديمية والوظيفية لعضو هيئة التدريس المسجلة في النظام الجامعي.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1" style="max-width: 860px; margin: 0 auto; gap: 1.5rem;">
+    
+    <!-- Profile Card Header & Avatar -->
+    <div class="card">
+      <div class="card-body" style="padding: 2.25rem 2rem;">
+        <div class="d-flex align-items-center gap-4" style="flex-wrap: wrap;">
+          <img 
+            src="{% static 'core/images/default-avatar.svg' %}" 
+            alt="{{ user.get_full_name|default:user.username }}" 
+            style="width: 84px; height: 84px; border-radius: var(--radius-full); border: 3px solid var(--border-color); box-shadow: var(--shadow-sm);"
+          >
+          <div style="flex: 1;">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <h2 style="font-size: var(--font-size-xl); margin: 0;">د. {{ user.get_full_name|default:user.username }}</h2>
+              <span class="badge badge-success"><span class="status-dot"></span> حساب معتمد</span>
+            </div>
+            <p class="text-muted" style="margin-bottom: 0.5rem;">{{ user.email }}</p>
+            <div class="d-flex align-items-center gap-2" style="flex-wrap: wrap;">
+              <span class="badge badge-primary">
+                <i class="bi bi-mortarboard-fill"></i>
+                عضو هيئة تدريس
+              </span>
+              <span class="badge badge-neutral">
+                {{ user.doctor_profile.get_specializations_display|default:'غير محدد' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Official Details -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-person-badge-fill text-primary" style="margin-left: 0.5rem;"></i>
+          البيانات الوظيفية والأكاديمية
+        </h3>
+      </div>
+      <div class="card-body" style="padding: 1.75rem 2rem;">
+        <div class="grid grid-cols-2" style="gap: 1.75rem;">
+          
+          <div>
+            <span class="text-muted text-xs d-block mb-1">الاسم واللقب الأكاديمي</span>
+            <div style="font-weight: var(--font-weight-semibold); color: var(--text-main); font-size: var(--font-size-base);">
+              د. {{ user.get_full_name|default:user.username }}
+            </div>
+          </div>
+
+          <div>
+            <span class="text-muted text-xs d-block mb-1">الرقم الوظيفي </span>
+            <div style="font-weight: var(--font-weight-semibold); color: var(--text-main); font-size: var(--font-size-base); font-family: monospace;">
+              {{ user.doctor_profile.employee_id|default:user.username }}
+            </div>
+          </div>
+
+          <div>
+            <span class="text-muted text-xs d-block mb-1">البريد الإلكتروني الجامعي</span>
+            <div style="font-weight: var(--font-weight-medium); color: var(--text-main); font-size: var(--font-size-base);">
+              {{ user.email|default:'غير محدد' }}
+            </div>
+          </div>
+
+          <div>
+            <span class="text-muted text-xs d-block mb-1">القسم والتخصص الأكاديمي</span>
+            <div style="font-weight: var(--font-weight-semibold); color: var(--text-main); font-size: var(--font-size-base);">
+              {{ user.doctor_profile.get_specializations_display|default:'غير محدد' }}
+            </div>
+          </div>
+
+          <div>
+            <span class="text-muted text-xs d-block mb-1">حالة الحساب  </span>
+            <div>
+              <span class="badge badge-success">
+                <i class="bi bi-check2-circle"></i>
+                نشط ومعتمد 
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <span class="text-muted text-xs d-block mb-1">تاريخ التسجيل </span>
+            <div style="font-weight: var(--font-weight-medium); color: var(--text-muted); font-size: var(--font-size-sm);">
+              {{ user.date_joined|date:"d M Y" }}
+            </div>
+          </div>
+
+        </div>
+
+        <div class="mt-4 pt-3" style="border-top: 1px solid var(--border-color-subtle);">
+          <div class="alert alert-info m-0">
+            <div class="alert-icon"><i class="bi bi-shield-lock"></i></div>
+            <div class="alert-content">
+              <div>لتحديث بيانات التعيين الأكاديمي أو تغيير المقررات المسندة تواصل مع مدير النظام</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+{% endblock %}

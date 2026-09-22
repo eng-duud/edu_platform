@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ lecture.title }} - {{ course.name }}{% endblock %}
+
+{% block breadcrumb %}
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <a href="{% url 'student_my_courses' %}" class="text-muted">مقرراتي</a>
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <a href="{% url 'student_course_detail' course.id %}" class="text-muted">{{ course.name }}</a>
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <span class="page-breadcrumb-item active">{{ lecture.title }}</span>
+{% endblock %}
+
+{% block content %}
+  <!-- Lecture Header -->
+  <div class="page-header">
+    <div class="page-title-group">
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge badge-primary">المحاضرة {{ lecture.order|default:'1' }}</span>
+        <span class="text-muted text-small">{{ course.name }}</span>
+      </div>
+      <h1 class="page-title">{{ lecture.title }}</h1>
+    </div>
+    <div class="page-actions">
+      <a href="{% url 'student_course_detail' course.id %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-right"></i>
+        <span>العودة لقائمة المحاضرات</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 mb-4" style="gap: 1.5rem;">
+    
+    <!-- 1. Video Player Section (Rendered only if video exists) -->
+    {% if lecture.video_file or lecture.video %}
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="bi bi-play-circle-fill text-primary" style="margin-left: 0.5rem;"></i>
+            التسجيل المرئي للمحاضرة
+          </h3>
+        </div>
+        <div class="card-body" style="padding: 0; background-color: #0F172A;">
+          <div style="position: relative; width: 100%; max-height: 520px; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center;">
+            <video 
+              controls 
+              preload="metadata" 
+              style="width: 100%; height: 100%; object-fit: contain;" 
+              controlsList="nodownload"
+            >
+              <source src="{{ lecture.video_file.url|default:lecture.video.url|default:lecture.video }}" type="video/mp4">
+              متصفحك لا يدعم تشغيل هذا الفيديو.
+            </video>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- 2. Lecture Description & Key Points -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-card-text text-primary" style="margin-left: 0.5rem;"></i>
+          محتوى وأهم نقاط المحاضرة
+        </h3>
+      </div>
+      <div class="card-body">
+        {% if lecture.description %}
+          <div class="mb-4">
+            <h4 style="font-size: var(--font-size-base); font-weight: var(--font-weight-semibold); margin-bottom: 0.5rem;">الوصف العام</h4>
+            <p style="line-height: var(--line-height-relaxed); color: var(--text-body);">
+              {{ lecture.description|linebreaks }}
+            </p>
+          </div>
+        {% endif %}
+
+        {% if lecture.points or lecture.key_points %}
+          <div>
+            <h4 style="font-size: var(--font-size-base); font-weight: var(--font-weight-semibold); margin-bottom: 0.75rem;">أهم النقاط والمفاهيم</h4>
+            <div style="background-color: var(--bg-surface-subtle); padding: 1.25rem 1.5rem; border-radius: var(--radius-md); border-right: 4px solid var(--brand-accent);">
+              <div style="line-height: var(--line-height-relaxed); color: var(--text-body);">
+                {{ lecture.points|default:lecture.key_points|linebreaks }}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+
+        {% if not lecture.description and not lecture.points and not lecture.key_points %}
+          <p class="text-muted">لم تتم إضافة ملخص نصي لهذه المحاضرة.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- 3. Lecture Attachment / Document Section (Rendered only if file exists) -->
+    {% if lecture.file or lecture.attachment %}
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="bi bi-paperclip text-primary" style="margin-left: 0.5rem;"></i>
+            المرفقات والملفات التعليمية
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between p-3" style="background-color: var(--bg-surface-subtle); border-radius: var(--radius-md); border: 1px solid var(--border-color); flex-wrap: wrap; gap: 1rem;">
+            <div class="d-flex align-items-center gap-3">
+              <div style="width: 44px; height: 44px; background-color: var(--color-danger-bg); color: var(--color-danger); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                <i class="bi bi-file-earmark-pdf-fill"></i>
+              </div>
+              <div>
+                <div style="font-weight: var(--font-weight-semibold); color: var(--text-main);">ملف المحاضرة والمذكرة الدراسية</div>
+                <div class="text-muted text-xs">مستند إلكتروني متاح للتحميل والدراسة</div>
+              </div>
+            </div>
+            <a href="{{ lecture.file.url|default:lecture.attachment.url|default:'#' }}" target="_blank" class="btn btn-primary btn-sm">
+              <i class="bi bi-download"></i>
+              <span>تحميل الملف</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+{% endblock %}

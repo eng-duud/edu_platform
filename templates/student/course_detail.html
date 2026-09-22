@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ course.name }} - منصة التعليم الجامعية{% endblock %}
+
+{% block breadcrumb %}
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <a href="{% url 'student_my_courses' %}" class="text-muted">مقرراتي</a>
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <span class="page-breadcrumb-item active">{{ course.name }}</span>
+{% endblock %}
+
+{% block content %}
+  <!-- Course Overview Card -->
+  <div class="card mb-4">
+    <div class="card-body" style="padding: 2rem;">
+      <div class="d-flex align-items-start justify-content-between" style="flex-wrap: wrap; gap: 1.5rem;">
+        <div>
+          <div class="course-card-tags mb-2">
+            {% if course.specialization %}
+              <span class="badge badge-primary">{{ course.specialization.name|default:course.specialization }}</span>
+            {% endif %}
+            {% if course.level %}
+              <span class="badge badge-neutral">{{ course.level.name|default:course.level }}</span>
+            {% endif %}
+          </div>
+          <h1 class="page-title" style="margin-bottom: 0.5rem;">{{ course.name }}</h1>
+          <div class="course-meta-row" style="margin: 0;">
+            <div class="course-meta-item">
+              <i class="bi bi-person-fill text-muted"></i>
+              <span>أستاذ المقرر: <strong>د. {{ course.doctor.user.get_full_name|default:course.doctor.full_name|default:course.doctor|default:'عضو هيئة التدريس' }}</strong></span>
+            </div>
+            <div class="course-meta-item">
+              <i class="bi bi-collection-play text-muted"></i>
+              <span>{{ lectures.count|default:course.lectures.count|default:'0' }} محاضرات مسجلة</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course Syllabus / Document Download -->
+        {% if course.file or course.syllabus %}
+          <div class="d-flex align-items-center">
+            <a href="{{ course.file.url|default:course.syllabus.url|default:'#' }}" target="_blank" class="btn btn-secondary">
+              <i class="bi bi-file-earmark-arrow-down-fill text-primary"></i>
+              <span>تحميل ملف المقرر (Syllabus)</span>
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Course Description -->
+      <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color-subtle);">
+        <h3 style="font-size: var(--font-size-md); font-weight: var(--font-weight-semibold); margin-bottom: 0.5rem;">عن هذا المقرر</h3>
+        <p class="text-body" style="line-height: var(--line-height-relaxed); margin: 0;">
+          {{ course.description|default:'لا يوجد وصف تفصيلي متاح لهذا المقرر حالياً.' }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lectures List Section -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h2 style="font-size: var(--font-size-xl); margin: 0;">محاضرات المقرر</h2>
+      <p class="text-muted text-small m-0">تصفح المحاضرات الدراسية واطلع على الشروحات والمرفقات</p>
+    </div>
+  </div>
+
+  {% if lectures or course.lectures.all %}
+    <div class="lecture-list">
+      {% for lecture in lectures|default:course.lectures.all %}
+        {% include "components/lecture_item.html" with lecture=lecture course_id=course.id is_doctor=False %}
+      {% endfor %}
+    </div>
+  {% else %}
+    {% include "components/empty_state.html" with icon="bi-play-circle" title="لم تتم إضافة أي محاضرات لهذا المقرر بعد" description="سيقوم أستاذ المقرر برفع المحاضرات والمواد العلمية قريباً." %}
+  {% endif %}
+
+{% endblock %}

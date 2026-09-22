@@ -1,0 +1,32 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
+.env
+.venv
+env/
+venv/
+my_env/
+ENV/
+
+# Database
+*.sqlite3
+*.db
+
+# Media uploads (optional: exclude user-uploaded test media files)
+media/courses/*.pdf
+media/courses/*.mp4
+media/lectures/files/*
+media/lectures/videos/*
+!media/.gitkeep
+!media/**/.gitkeep
+
+# IDE & OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

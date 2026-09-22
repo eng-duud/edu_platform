@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}معاينة نظام التصميم - منصة التعليم الجامعية{% endblock %}
+
+{% block breadcrumb %}
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <span class="page-breadcrumb-item active">معاينة الهيكل ونظام التصميم</span>
+{% endblock %}
+
+{% block content %}
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title-group">
+      <h1 class="page-title">نظام التصميم والهيكل الأساسي</h1>
+      <p class="page-subtitle">معاينة متكاملة للهوية البصرية الأكاديمية والمكونات وعناصر واجهة المستخدم في المرحلة الأولى.</p>
+    </div>
+    <div class="page-actions">
+      <button type="button" class="btn btn-secondary" onclick="alert('زر تجريبي')">
+        <i class="bi bi-download"></i>
+        <span>تصدير تقرير</span>
+      </button>
+      <button type="button" class="btn btn-primary" onclick="openModal('sampleModal')">
+        <i class="bi bi-window-stack"></i>
+        <span>معاينة النافذة المنبثقة</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Messages / Alert Demonstration -->
+  <div class="mb-4">
+    {% include "components/alert.html" with type="info" title="ملاحظة هامة" message="تم إكمال المرحلة الأولى: نظام التصميم والهيكل الأساسي (Design System + Base Layout) بنجاح." %}
+    {% include "components/alert.html" with type="success" title="جاهزية القالب" message="الهيكل متوافق بنسبة 100% مع Django Template Language، ويدعم الـ RTL والتجاوب التام." %}
+  </div>
+
+  <!-- Academic Stat Cards Demonstration -->
+  <h3 class="mb-3">البطاقات الإحصائية (Stat Cards)</h3>
+  <div class="grid grid-cols-4 mb-4">
+    {% include "components/stat_card.html" with title="مقرراتي المسجلة" value="4" icon="bi-journal-check" color_class="primary" %}
+    {% include "components/stat_card.html" with title="طلبات قيد المراجعة" value="1" icon="bi-hourglass-split" color_class="warning" %}
+    {% include "components/stat_card.html" with title="إجمالي الطلاب" value="128" icon="bi-people" color_class="success" %}
+    {% include "components/stat_card.html" with title="المحاضرات المنشورة" value="36" icon="bi-play-circle" color_class="info" %}
+  </div>
+
+  <!-- Status Badges & Buttons Demonstration -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3 class="card-title">أنماط الشارات والأزرار (Badges & Buttons)</h3>
+    </div>
+    <div class="card-body">
+      <div class="mb-4">
+        <div class="text-small text-muted mb-2">شارات الحالة الأكاديمية:</div>
+        <div class="d-flex align-items-center gap-2" style="flex-wrap: wrap;">
+          <span class="badge badge-success"><span class="status-dot"></span> مقبول</span>
+          <span class="badge badge-warning"><span class="status-dot"></span> قيد المراجعة</span>
+          <span class="badge badge-danger"><span class="status-dot"></span> مرفوض</span>
+          <span class="badge badge-info"><span class="status-dot"></span> متاح للتسجيل</span>
+          <span class="badge badge-neutral"><span class="status-dot"></span> مسودة</span>
+          <span class="badge badge-primary"><span class="status-dot"></span> المستوى الثالث</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="text-small text-muted mb-2">أنماط الأزرار المعتمدة:</div>
+        <div class="d-flex align-items-center gap-2" style="flex-wrap: wrap;">
+          <button class="btn btn-primary"><i class="bi bi-plus-lg"></i> زر أساسي</button>
+          <button class="btn btn-accent"><i class="bi bi-box-arrow-up-right"></i> زر تفاعلي</button>
+          <button class="btn btn-secondary"><i class="bi bi-sliders"></i> زر ثانوي</button>
+          <button class="btn btn-outline-primary"><i class="bi bi-eye"></i> زر مفرغ</button>
+          <button class="btn btn-danger"><i class="bi bi-trash"></i> زر حذف</button>
+          <button class="btn btn-ghost"><i class="bi bi-arrow-right"></i> زر شفاف</button>
+          <button class="btn btn-primary btn-sm">زر صغير</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State Demonstration -->
+  <h3 class="mb-3">مكون الحالة الفارغة (Empty State)</h3>
+  <div class="mb-4">
+    {% include "components/empty_state.html" with icon="bi-journal-x" title="لا توجد طلبات تسجيل معلقة" description="جميع طلبات التسجيل المقدمة من الطلاب تم البت فيها والموافقة عليها." action_url="#" action_text="العودة للرئيسية" %}
+  </div>
+
+  <!-- Modal Demonstration -->
+  <div class="modal-backdrop" id="sampleModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">تأكيد الإجراء الأكاديمي</h3>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="closeModal('sampleModal')" aria-label="إغلاق">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>هذا نموذج لنافذة منبثقة (Modal) مصممة وفق معايير الوصولية وRTL، وتستخدم في التأكيدات مثل حذف محاضرة أو الموافقة على طلب تسجيل.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('sampleModal')">إلغاء</button>
+        <button type="button" class="btn btn-primary" onclick="closeModal('sampleModal')">تأكيد ومتابعة</button>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}المقررات المتاحة - منصة التعليم الجامعية{% endblock %}
+
+{% block breadcrumb %}
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <span class="page-breadcrumb-item active">المقررات المتاحة</span>
+{% endblock %}
+
+{% block content %}
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title-group">
+      <h1 class="page-title">المقررات المتاحة</h1>
+      <p class="page-subtitle">المقررات الدراسية المتاحة لتخصصك ومستواك الأكاديمي الحالي.</p>
+    </div>
+  </div>
+
+  <!-- Search Filter Bar -->
+  <div class="card mb-4">
+    <div class="card-body" style="padding: 1.25rem 1.5rem;">
+      <form method="get" action="{% url 'student_courses' %}" class="d-flex align-items-center gap-3" style="flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 260px; position: relative;">
+          <input 
+            type="search" 
+            name="q" 
+            value="{{ request.GET.q|default:'' }}" 
+            class="form-control" 
+            placeholder="ابحث عن مقرر باسم المقرر الدراسي..." 
+            aria-label="البحث عن مقرر"
+          >
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-search"></i>
+          <span>بحث</span>
+        </button>
+        {% if request.GET.q %}
+          <a href="{% url 'student_courses' %}" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i>
+            <span>إلغاء التصفية</span>
+          </a>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+
+  <!-- Courses Grid -->
+  {% if courses %}
+    <div class="grid grid-cols-3">
+      {% for course in courses %}
+        {% include "components/course_card.html" with course=course mode="student_available" enrollment_status=course.enrollment_status %}
+      {% endfor %}
+    </div>
+
+    {% include "components/pagination.html" with page_obj=page_obj %}
+
+  {% else %}
+    {% if request.GET.q %}
+      {% include "components/empty_state.html" with icon="bi-search" title="لم يتم العثور على نتائج" description="لا توجد مقررات تطابق عبارة البحث الحالية. جرب البحث باسم مقرر آخر." action_url="/courses/" action_text="عرض جميع المقررات" %}
+    {% else %}
+      {% include "components/empty_state.html" with icon="bi-journal-x" title="لا توجد مقررات متاحة حاليًا" description="لم تتم إضافة مقررات لتخصصك ومستواك الدراسي بعد. يرجى مراجعة القسم الأكاديمي." %}
+    {% endif %}
+  {% endif %}
+
+{% endblock %}

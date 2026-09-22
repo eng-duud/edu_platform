@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}تسجيل الدخول - منصة التعليم الجامعية{% endblock %}
+
+{% block breadcrumb %}
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <span class="page-breadcrumb-item active">تسجيل الدخول</span>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-card">
+    
+    <!-- Auth Header -->
+    <div class="auth-header">
+      <div class="auth-logo">
+        <img src="{% static 'core/images/logo.svg' %}" alt="شعار منصة الجامعة">
+      </div>
+      <h1 class="auth-title">تسجيل الدخول</h1>
+      <p class="auth-subtitle">أدخل بياناتك الأكاديمية للدخول إلى المنصة</p>
+    </div>
+
+    <!-- Auth Body / Form -->
+    <div class="auth-body">
+      
+      <!-- Authentication Error Alert -->
+      {% if form.errors or error_message %}
+        <div class="alert alert-danger" role="alert">
+          <div class="alert-icon">
+            <i class="bi bi-exclamation-octagon-fill"></i>
+          </div>
+          <div class="alert-content">
+            <div class="alert-title">خطأ في المصادقة</div>
+            <div>{{ error_message|default:"بيانات الدخول غير صحيحة. يرجى التأكد من صحة اسم المستخدم وكلمة المرور." }}</div>
+          </div>
+          <button type="button" class="alert-close" aria-label="إغلاق">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      {% endif %}
+
+      <form method="post" action="{% url 'login' %}" novalidate>
+        {% csrf_token %}
+
+        <!-- Username / Academic ID -->
+        <div class="form-group">
+          <label for="id_username" class="form-label">
+            <span class="required-mark">*</span>
+            الرقم الأكاديمي / الوظيفي
+          </label>
+          <div style="position: relative;">
+            <input 
+              type="text" 
+              name="username" 
+              id="id_username" 
+              class="form-control" 
+              placeholder="الرقم الجامعي للطلاب، الرقم الوظيفي للدكاترة" 
+              required 
+              autofocus 
+              value="{{ form.username.value|default:'' }}"
+              autocomplete="username"
+            >
+          </div>
+          {% if form.username.errors %}
+            <span class="form-error">{{ form.username.errors.0 }}</span>
+          {% else %}
+            <span class="form-helper"></span>
+          {% endif %}
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="id_password" class="form-label">
+            <span class="required-mark">*</span>
+            كلمة المرور
+          </label>
+          <div style="position: relative;">
+            <input 
+              type="password" 
+              name="password" 
+              id="id_password" 
+              class="form-control" 
+              placeholder="••••••••" 
+              required 
+              autocomplete="current-password"
+            >
+          </div>
+          {% if form.password.errors %}
+            <span class="form-error">{{ form.password.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Submit Button -->
+        <div class="mt-4">
+          <button type="submit" class="btn btn-primary btn-lg w-100">
+            <i class="bi bi-box-arrow-in-left"></i>
+            <span>تسجيل الدخول</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Auth Footer -->
+    <div class="auth-footer">
+      <span>ليس لديك حساب بعد؟</span>
+      <a href="{% url 'register' %}" class="btn-link" style="font-weight: var(--font-weight-semibold); margin-right: 0.35rem;">
+        إنشاء حساب جديد
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% comment %}
+  Reusable Lecture Item Component
+  Parameters:
+    - lecture: lecture object (id, order, title, description, file, video_file)
+    - course_id: id of the current course
+    - is_doctor: boolean flag for edit/delete actions
+{% endcomment %}
+<div class="lecture-item">
+  <div class="lecture-item-start">
+    <div class="lecture-number">
+      {{ lecture.order|default:forloop.counter|stringformat:"02d" }}
+    </div>
+    
+    <div class="lecture-info">
+      {% if is_doctor %}
+        <span class="lecture-title">{{ lecture.title }}</span>
+      {% else %}
+        <a href="{% url 'student_lecture_detail' course_id lecture.id %}" class="lecture-title">
+          {{ lecture.title }}
+        </a>
+      {% endif %}
+
+      <div class="lecture-meta">
+        {% if lecture.description %}
+          <span>{{ lecture.description|truncatewords:8 }}</span>
+        {% endif %}
+        
+        {% if lecture.file %}
+          <span class="badge badge-neutral text-xs">
+            <i class="bi bi-file-earmark-pdf"></i> ملف مرفق
+          </span>
+        {% endif %}
+
+        {% if lecture.video or lecture.video_file %}
+          <span class="badge badge-info text-xs">
+            <i class="bi bi-play-btn-fill"></i> فيديو
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="lecture-actions">
+    {% if is_doctor %}
+      <a href="{% url 'doctor_lecture_edit' course_id lecture.id %}" class="btn btn-secondary btn-sm" title="تعديل المحاضرة">
+        <i class="bi bi-pencil-square"></i>
+        <span>تعديل</span>
+      </a>
+      <a href="{% url 'doctor_lecture_delete' course_id lecture.id %}" class="btn btn-outline-danger btn-sm" title="حذف المحاضرة">
+        <i class="bi bi-trash"></i>
+        <span>حذف</span>
+      </a>
+    {% else %}
+      <a href="{% url 'student_lecture_detail' course_id lecture.id %}" class="btn btn-secondary btn-sm">
+        <i class="bi bi-eye"></i>
+        <span>عرض المحاضرة</span>
+      </a>
+    {% endif %}
+  </div>
+</div>

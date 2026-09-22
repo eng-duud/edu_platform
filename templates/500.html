@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}500 - خطأ في الخادم | منصة التعليم الجامعية{% endblock %}
+
+{% block breadcrumb %}
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <span class="page-breadcrumb-item active">500 خطأ في الخادم</span>
+{% endblock %}
+
+{% block content %}
+  <div class="d-flex align-items-center justify-content-center" style="min-height: 60vh; padding: 2rem 1rem;">
+    <div class="card" style="max-width: 540px; width: 100%; text-align: center;">
+      <div class="card-body" style="padding: 3.5rem 2rem;">
+        
+        <div style="font-size: 5rem; font-weight: 800; color: var(--color-danger); line-height: 1; letter-spacing: -2px; margin-bottom: 1rem; opacity: 0.85;">
+          500
+        </div>
+
+        <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--text-main); margin-bottom: 0.75rem;">
+          خطأ غير متوقع في الخادم
+        </h1>
+
+        <p class="text-muted" style="line-height: var(--line-height-relaxed); margin-bottom: 2rem;">
+          حدث خطأ داخلي أثناء معالجة طلبك الأكاديمي. تم تسجيل الخطأ لدى الفريق التقني، يرجى إعادة المحاولة لاحقًا.
+        </p>
+
+        <div class="d-flex align-items-center justify-content-center gap-2">
+          <a href="/" class="btn btn-primary btn-lg">
+            <i class="bi bi-house-door-fill"></i>
+            <span>العودة للرئيسية</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+{% endblock %}

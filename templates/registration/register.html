@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}إنشاء حساب جديد - منصة التعليم الجامعية{% endblock %}
+
+{% block breadcrumb %}
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <span class="page-breadcrumb-item active">إنشاء حساب أكاديمي</span>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-card" style="max-width: 620px;">
+    
+    <!-- Auth Header -->
+    <div class="auth-header">
+      <div class="auth-logo">
+        <img src="{% static 'core/images/logo.svg' %}" alt="شعار منصة الجامعة">
+      </div>
+      <h1 class="auth-title">إنشاء حساب أكاديمي جديد</h1>
+      <p class="auth-subtitle">انضم إلى المنصة التعليمية الجامعية بالدور المناسب لك</p>
+    </div>
+
+    <!-- Auth Body / Form -->
+    <div class="auth-body">
+
+      <!-- Form General Errors -->
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+          <div class="alert-icon">
+            <i class="bi bi-exclamation-octagon-fill"></i>
+          </div>
+          <div class="alert-content">
+            <div class="alert-title">تنبيه</div>
+            {% for error in form.non_field_errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          </div>
+          <button type="button" class="alert-close" aria-label="إغلاق">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      {% endif %}
+
+      {% if not specializations %}
+        <div class="alert alert-warning" role="alert">
+          <div class="alert-icon"><i class="bi bi-info-circle-fill"></i></div>
+          <div class="alert-content">
+            <div class="alert-title">تنبيه لمدير النظام</div>
+            <div>لم تتم إضافة أي تخصصات بعد. يرجى الدخول إلى <a href="/admin/courses/specialization/" target="_blank" style="text-decoration: underline; font-weight: bold;">لوحة الإدارة</a> وإضافة تخصص واحد على الأقل لتفعيل التسجيل.</div>
+          </div>
+        </div>
+      {% endif %}
+
+      <form method="post" action="{% url 'register' %}" id="registrationForm" novalidate>
+        {% csrf_token %}
+
+        <!-- 1. Role Selection Cards -->
+        <label class="form-label mb-2">
+          <span class="required-mark">*</span>
+          نوع الحساب الأكاديمي:
+        </label>
+        <div class="role-selector-grid">
+          
+          <!-- Option: Student -->
+          <label class="role-option selected" id="roleOptionStudent" for="role_student">
+            <input 
+              type="radio" 
+              name="user_type" 
+              id="role_student" 
+              value="student" 
+              class="role-option-radio"
+              checked
+            >
+            <div class="role-option-icon">
+              <i class="bi bi-person-fill"></i>
+            </div>
+            <div class="role-option-title">حساب طالب</div>
+            <div class="role-option-desc">تسجيل ومتابعة المقررات الدراسية</div>
+          </label>
+
+          <!-- Option: Doctor -->
+          <label class="role-option" id="roleOptionDoctor" for="role_doctor">
+            <input 
+              type="radio" 
+              name="user_type" 
+              id="role_doctor" 
+              value="doctor" 
+              class="role-option-radio"
+            >
+            <div class="role-option-icon">
+              <i class="bi bi-mortarboard-fill"></i>
+            </div>
+            <div class="role-option-title">حساب دكتور</div>
+            <div class="role-option-desc">إدارة المقررات والمحاضرات والطلاب</div>
+          </label>
+
+        </div>
+
+        <!-- Doctor Pending Approval Notice (Shown only when Doctor role is selected) -->
+        <div class="alert alert-warning d-none" id="doctorApprovalNotice" role="alert">
+          <div class="alert-icon">
+            <i class="bi bi-shield-lock-fill"></i>
+          </div>
+          <div class="alert-content">
+            <div class="alert-title">تنبيه هام لعضو هيئة التدريس</div>
+            <div>سيحتاج حساب الدكتور إلى موافقة المدير من لوحة التحكم قبل أن تتمكن من تسجيل الدخول والبدء بإدارة المقررات.</div>
+          </div>
+        </div>
+
+        <!-- Common Name Field -->
+        <div class="form-group">
+          <label for="id_full_name" class="form-label">
+            <span class="required-mark">*</span>
+            الاسم الكامل
+          </label>
+          <input 
+            type="text" 
+            name="full_name" 
+            id="id_full_name" 
+            class="form-control" 
+            placeholder="مثال: أحمد محمد علي" 
+            required 
+            value="{{ form.full_name.value|default:'' }}"
+          >
+          {% if form.full_name.errors %}
+            <span class="form-error">{{ form.full_name.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Student-Specific Username Label / Doctor-Specific Label -->
+        <div class="form-group">
+          <label for="id_username" class="form-label" id="usernameLabel">
+            <span class="required-mark">*</span>
+            الرقم الجامعي / اسم المستخدم
+          </label>
+          <input 
+            type="text" 
+            name="username" 
+            id="id_username" 
+            class="form-control" 
+            placeholder="مثال: 44102938" 
+            required 
+            value="{{ form.username.value|default:'' }}"
+            autocomplete="username"
+          >
+          <span class="form-helper" id="usernameHelper">أدخل الرقم الجامعي المعتمد في السجلات الأكاديمية</span>
+          {% if form.username.errors %}
+            <span class="form-error">{{ form.username.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Common Email Field -->
+        <div class="form-group">
+          <label for="id_email" class="form-label">
+            <span class="required-mark">*</span>
+            البريد الإلكتروني
+          </label>
+          <input 
+            type="email" 
+            name="email" 
+            id="id_email" 
+            class="form-control" 
+            placeholder="name@university.edu" 
+            required 
+            value="{{ form.email.value|default:'' }}"
+            autocomplete="email"
+          >
+          {% if form.email.errors %}
+            <span class="form-error">{{ form.email.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Specialization Field -->
+        <div class="form-group">
+          <label for="id_specialization" class="form-label">
+            <span class="required-mark">*</span>
+            التخصص الأكاديمي
+          </label>
+          <select name="specialization" id="id_specialization" class="form-select" required>
+            <option value="" disabled selected>اختر التخصص...</option>
+            {% for spec in specializations %}
+              <option value="{{ spec.id }}" {% if form.specialization.value|stringformat:"s" == spec.id|stringformat:"s" %}selected{% endif %}>
+                {{ spec.name }}
+              </option>
+            {% empty %}
+              <option value="" disabled>لا توجد تخصصات مضافة بعد (أضف تخصص من لوحة الإدارة أولاً)</option>
+            {% endfor %}
+          </select>
+          {% if form.specialization.errors %}
+            <span class="form-error">{{ form.specialization.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Student-Only: Level Field -->
+        <div class="form-group" id="studentLevelContainer">
+          <label for="id_level" class="form-label">
+            <span class="required-mark">*</span>
+            المستوى الدراسي
+          </label>
+          <select name="level" id="id_level" class="form-select">
+            <option value="" selected>اختر المستوى الدراسي...</option>
+            {% for lvl in levels %}
+              <option value="{{ lvl.id }}" data-spec="{{ lvl.specialization_id }}" {% if form.level.value|stringformat:"s" == lvl.id|stringformat:"s" %}selected{% endif %}>
+                {{ lvl.name }} ({{ lvl.specialization.name }})
+              </option>
+            {% empty %}
+              <option value="" disabled>لا توجد مستويات مسجلة بعد</option>
+            {% endfor %}
+          </select>
+          {% if form.level.errors %}
+            <span class="form-error">{{ form.level.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Password and Confirmation Grid -->
+        <div class="grid grid-cols-2">
+          
+          <div class="form-group">
+            <label for="id_password1" class="form-label">
+              <span class="required-mark">*</span>
+              كلمة المرور
+            </label>
+            <input 
+              type="password" 
+              name="password" 
+              id="id_password1" 
+              class="form-control" 
+              placeholder="••••••••" 
+              required 
+              autocomplete="new-password"
+            >
+            {% if form.password.errors %}
+              <span class="form-error">{{ form.password.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+          <div class="form-group">
+            <label for="id_password2" class="form-label">
+              <span class="required-mark">*</span>
+              تأكيد كلمة المرور
+            </label>
+            <input 
+              type="password" 
+              name="password_confirm" 
+              id="id_password2" 
+              class="form-control" 
+              placeholder="••••••••" 
+              required 
+              autocomplete="new-password"
+            >
+            {% if form.password_confirm.errors %}
+              <span class="form-error">{{ form.password_confirm.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+        </div>
+
+        <!-- Submit Button -->
+        <div class="mt-4">
+          <button type="submit" class="btn btn-primary btn-lg w-100" id="submitBtn">
+            <i class="bi bi-person-check-fill"></i>
+            <span>إنشاء الحساب الأكاديمي</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Auth Footer -->
+    <div class="auth-footer">
+      <span>لديك حساب بالفعل؟</span>
+      <a href="{% url 'login' %}" class="btn-link" style="font-weight: var(--font-weight-semibold); margin-right: 0.35rem;">
+        تسجيل الدخول
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const radioStudent = document.getElementById('role_student');
+    const radioDoctor = document.getElementById('role_doctor');
+    const cardStudent = document.getElementById('roleOptionStudent');
+    const cardDoctor = document.getElementById('roleOptionDoctor');
+    const doctorNotice = document.getElementById('doctorApprovalNotice');
+    const studentLevelContainer = document.getElementById('studentLevelContainer');
+    const levelSelect = document.getElementById('id_level');
+    const usernameLabel = document.getElementById('usernameLabel');
+    const usernameInput = document.getElementById('id_username');
+    const usernameHelper = document.getElementById('usernameHelper');
+
+    function updateRoleUI() {
+      if (radioDoctor.checked) {
+        // Doctor is selected
+        cardDoctor.classList.add('selected');
+        cardStudent.classList.remove('selected');
+        doctorNotice.classList.remove('d-none');
+        studentLevelContainer.classList.add('d-none');
+        if (levelSelect) levelSelect.removeAttribute('required');
+
+        usernameLabel.innerHTML = '<span class="required-mark">*</span> الرقم الوظيفي / اسم المستخدم';
+        usernameInput.placeholder = 'مثال: DOC-8821 أو dr.ahmed';
+        usernameHelper.textContent = 'أدخل الرقم الوظيفي المعتمد أو اسم المستخدم الأكاديمي الخاص بعضو هيئة التدريس';
+      } else {
+        // Student is selected
+        cardStudent.classList.add('selected');
+        cardDoctor.classList.remove('selected');
+        doctorNotice.classList.add('d-none');
+        studentLevelContainer.classList.remove('d-none');
+        if (levelSelect) levelSelect.setAttribute('required', 'required');
+
+        usernameLabel.innerHTML = '<span class="required-mark">*</span> الرقم الجامعي / اسم المستخدم';
+        usernameInput.placeholder = 'مثال: 44102938';
+        usernameHelper.textContent = 'أدخل الرقم الجامعي المعتمد في السجلات الأكاديمية';
+      }
+    }
+
+    radioStudent.addEventListener('change', updateRoleUI);
+    radioDoctor.addEventListener('change', updateRoleUI);
+
+    // Dynamic filtering of levels based on chosen specialization
+    const specSelect = document.getElementById('id_specialization');
+    function filterLevelsBySpecialization() {
+      if (!specSelect || !levelSelect) return;
+      const selectedSpecId = specSelect.value;
+      let hasVisible = false;
+
+      for (let i = 1; i < levelSelect.options.length; i++) {
+        const opt = levelSelect.options[i];
+        const optSpec = opt.getAttribute('data-spec');
+        if (!selectedSpecId || !optSpec || optSpec === selectedSpecId) {
+          opt.hidden = false;
+          opt.style.display = '';
+          hasVisible = true;
+        } else {
+          opt.hidden = true;
+          opt.style.display = 'none';
+        }
+      }
+
+      if (levelSelect.selectedIndex > 0 && levelSelect.options[levelSelect.selectedIndex].hidden) {
+        levelSelect.selectedIndex = 0;
+      }
+    }
+
+    if (specSelect) {
+      specSelect.addEventListener('change', filterLevelsBySpecialization);
+      filterLevelsBySpecialization();
+    }
+
+    // Initial trigger
+    updateRoleUI();
+  });
+</script>
+{% endblock %}

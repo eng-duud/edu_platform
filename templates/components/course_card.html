@@ -1,0 +1,105 @@
+{% comment %}
+  Reusable Course Card Component
+  Parameters:
+    - course: The course object (id, name, doctor, level, specialization, description, lectures_count, students_count)
+    - mode: 'student_available', 'student_enrolled', 'doctor_manage'
+    - enrollment_status: 'none', 'pending', 'approved', 'rejected'
+{% endcomment %}
+<div class="course-card">
+  <div class="course-card-banner"></div>
+  
+  <div class="course-card-header">
+    <div class="course-card-tags">
+      {% if course.specialization %}
+        <span class="badge badge-primary">{{ course.specialization.name|default:course.specialization }}</span>
+      {% endif %}
+      {% if course.level %}
+        <span class="badge badge-neutral">{{ course.level.name|default:course.level }}</span>
+      {% endif %}
+    </div>
+    <h3 class="course-card-title">{{ course.name }}</h3>
+  </div>
+
+  <div class="course-card-body">
+    <div class="course-meta-row">
+      <div class="course-meta-item">
+        <i class="bi bi-person text-muted"></i>
+        <span>د. {{ course.doctor.user.get_full_name|default:course.doctor.full_name|default:course.doctor|default:'عضو هيئة التدريس' }}</span>
+      </div>
+      <div class="course-meta-item">
+        <i class="bi bi-play-circle text-muted"></i>
+        <span>{{ course.lectures.count|default:course.lectures_count|default:'0' }} محاضرة</span>
+      </div>
+    </div>
+
+    <p class="course-description">
+      {{ course.description|default:'لا يوجد وصف متاح لهذا المقرر حالياً.' }}
+    </p>
+  </div>
+
+  <div class="course-card-footer">
+    {% if mode == 'doctor_manage' %}
+      <div class="d-flex align-items-center gap-2 text-muted text-small">
+        <i class="bi bi-people"></i>
+        <span>{{ course.enrollments.count|default:course.students_count|default:'0' }} طالب</span>
+      </div>
+      <a href="{% url 'doctor_course_detail' course.id %}" class="btn btn-primary btn-sm">
+        <i class="bi bi-gear-fill"></i>
+        <span>إدارة المقرر</span>
+      </a>
+
+    {% elif mode == 'student_enrolled' %}
+      <span class="badge badge-success">
+        <span class="status-dot"></span> مسجل
+      </span>
+      <a href="{% url 'student_course_detail' course.id %}" class="btn btn-primary btn-sm">
+        <i class="bi bi-box-arrow-up-left"></i>
+        <span>دخول إلى المقرر</span>
+      </a>
+
+    {% else %}
+      {# Student Available Courses with dynamic enrollment status #}
+      {% if enrollment_status == 'approved' or course.is_enrolled %}
+        <span class="badge badge-success">
+          <span class="status-dot"></span> مسجل
+        </span>
+        <a href="{% url 'student_course_detail' course.id %}" class="btn btn-primary btn-sm">
+          <i class="bi bi-box-arrow-up-left"></i>
+          <span>فتح المقرر</span>
+        </a>
+
+      {% elif enrollment_status == 'pending' or course.is_pending %}
+        <span class="badge badge-warning">
+          <span class="status-dot"></span> قيد المراجعة
+        </span>
+        <button type="button" class="btn btn-secondary btn-sm" disabled>
+          <i class="bi bi-hourglass-split"></i>
+          <span>قيد المراجعة</span>
+        </button>
+
+      {% elif enrollment_status == 'rejected' or course.is_rejected %}
+        <span class="badge badge-danger">
+          <span class="status-dot"></span> مرفوض
+        </span>
+        <form method="post" action="{% url 'student_course_enroll' course.id %}" class="m-0">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-arrow-repeat"></i>
+            <span>إعادة طلب التسجيل</span>
+          </button>
+        </form>
+
+      {% else %}
+        <span class="badge badge-neutral">متاح</span>
+        <form method="post" action="{% url 'student_course_enroll' course.id %}" class="m-0">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-accent btn-sm">
+            <i class="bi bi-plus-circle"></i>
+            <span>طلب التسجيل</span>
+          </button>
+        </form>
+      {% endif %}
+
+    {% endif %}
+  </div>
+</div>

@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  {% if lecture %}تعديل المحاضرة: {{ lecture.title }}{% else %}إضافة محاضرة جديدة{% endif %} - {{ course.name }}
+{% endblock %}
+
+{% block breadcrumb %}
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <a href="{% url 'doctor_courses' %}" class="text-muted">موادي</a>
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <a href="{% url 'doctor_course_detail' course.id %}" class="text-muted">{{ course.name }}</a>
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <span class="page-breadcrumb-item active">
+    {% if lecture %}تعديل محاضرة{% else %}إضافة محاضرة جديدة{% endif %}
+  </span>
+{% endblock %}
+
+{% block content %}
+  <div class="page-header">
+    <div class="page-title-group">
+      <h1 class="page-title">
+        {% if lecture %}تعديل المحاضرة: {{ lecture.title }}{% else %}إضافة محاضرة جديدة{% endif %}
+      </h1>
+      <p class="page-subtitle">المقرر: <strong>{{ course.name }}</strong></p>
+    </div>
+    <div class="page-actions">
+      <a href="{% url 'doctor_course_detail' course.id %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-right"></i>
+        <span>العودة لإدارة المقرر</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="card" style="max-width: 840px; margin: 0 auto;">
+    <div class="card-header">
+      <h3 class="card-title">
+        <i class="bi bi-journal-plus text-primary" style="margin-left: 0.5rem;"></i>
+        بيانات المحاضرة والمحتوى العلمي
+      </h3>
+    </div>
+    <div class="card-body" style="padding: 2rem;">
+      
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+          <div class="alert-icon"><i class="bi bi-exclamation-octagon-fill"></i></div>
+          <div class="alert-content">
+            {% for error in form.non_field_errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <div class="grid grid-cols-3" style="gap: 1.25rem;">
+          
+          <!-- Lecture Order / Number -->
+          <div class="form-group" style="grid-column: span 1;">
+            <label for="id_order" class="form-label">
+              <span class="required-mark">*</span>
+              رقم المحاضرة
+            </label>
+            <input 
+              type="number" 
+              name="order" 
+              id="id_order" 
+              class="form-control" 
+              placeholder="1" 
+              min="1" 
+              required 
+              value="{% if lecture %}{{ lecture.order }}{% else %}{{ form.order.value|default:form.order.initial|default:'1' }}{% endif %}"
+            >
+            {% if form.order.errors %}
+              <span class="form-error">{{ form.order.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+          <!-- Lecture Title -->
+          <div class="form-group" style="grid-column: span 2;">
+            <label for="id_title" class="form-label">
+              <span class="required-mark">*</span>
+              عنوان المحاضرة
+            </label>
+            <input 
+              type="text" 
+              name="title" 
+              id="id_title" 
+              class="form-control" 
+              placeholder="مثال: مقدمة في  'موضوع المحاضرة'" 
+              required 
+              value="{% if lecture %}{{ lecture.title }}{% else %}{{ form.title.value|default:'' }}{% endif %}"
+            >
+            {% if form.title.errors %}
+              <span class="form-error">{{ form.title.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="id_description" class="form-label">
+            وصف المحاضرة
+          </label>
+          <textarea 
+            name="description" 
+            id="id_description" 
+            rows="3" 
+            class="form-control" 
+            placeholder="نبذة مختصرة توضح ما سيتعلمه الطالب في هذه المحاضرة..."
+          >{% if lecture %}{{ lecture.description }}{% else %}{{ form.description.value|default:'' }}{% endif %}</textarea>
+          {% if form.description.errors %}
+            <span class="form-error">{{ form.description.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Key Points -->
+        <div class="form-group">
+          <label for="id_points" class="form-label">
+            نقاط المحاضرة الأساسية
+          </label>
+          <textarea 
+            name="points" 
+            id="id_points" 
+            rows="4" 
+            class="form-control" 
+            placeholder="اكتب النقاط الرئيسية (كل نقطة في سطر مستقل):&#10;• ........ &#10;• ........ &#10;• .........."
+          >{% if lecture %}{{ lecture.points }}{% else %}{{ form.points.value|default:'' }}{% endif %}</textarea>
+          <span class="form-helper">تساعد هذه النقاط الطالب على مراجعة الأفكار الأساسية بسرعة.</span>
+          {% if form.points.errors %}
+            <span class="form-error">{{ form.points.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <div class="grid grid-cols-2" style="gap: 1.5rem; margin-top: 1rem;">
+          
+          <!-- Lecture File Upload -->
+          <div class="form-group">
+            <label for="id_file" class="form-label">
+              ملف المحاضرة (مستند / PDF)
+            </label>
+            <input 
+              type="file" 
+              name="file" 
+              id="id_file" 
+              class="form-control" 
+              accept=".pdf,.doc,.docx,.ppt,.pptx"
+            >
+            <span class="form-helper">الصيغ المدعومة: PDF, DOCX, PPTX (الحد الأقصى 50MB)</span>
+            
+            {% if lecture and lecture.file %}
+              <div class="mt-2 text-xs text-muted">
+                <i class="bi bi-file-earmark-check text-success"></i>
+                الملف الحالي: <a href="{{ lecture.file.url }}" target="_blank">{{ lecture.file.name }}</a>
+              </div>
+            {% endif %}
+
+            {% if form.file.errors %}
+              <span class="form-error">{{ form.file.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+          <!-- Lecture Video Upload -->
+          <div class="form-group">
+            <label for="id_video" class="form-label">
+              فيديو المحاضرة (تسجيل مرئي)
+            </label>
+            <input 
+              type="file" 
+              name="video" 
+              id="id_video" 
+              class="form-control" 
+              accept="video/mp4,video/webm"
+            >
+            <span class="form-helper">الصيغ المدعومة: MP4, WebM (فيديو تعليمي عالي الجودة)</span>
+            
+            {% if lecture and lecture.video %}
+              <div class="mt-2 text-xs text-muted">
+                <i class="bi bi-film text-info"></i>
+                الفيديو الحالي مرفوع وجاهز للعرض
+              </div>
+            {% endif %}
+
+            {% if form.video.errors %}
+              <span class="form-error">{{ form.video.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+        </div>
+
+        <!-- Form Action Buttons -->
+        <div class="d-flex align-items-center justify-content-end gap-3 mt-4 pt-3" style="border-top: 1px solid var(--border-color-subtle);">
+          <a href="{% url 'doctor_course_detail' course.id %}" class="btn btn-secondary">
+            إلغاء
+          </a>
+          <button type="submit" class="btn btn-primary btn-lg">
+            <i class="bi bi-check2-circle"></i>
+            <span>{% if lecture %}حفظ التعديلات{% else %}حفظ المحاضرة{% endif %}</span>
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

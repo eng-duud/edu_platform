@@ -1,0 +1,26 @@
+{% comment %}
+  Reusable Alert Component
+  Usage: {% include "components/alert.html" with type="success" title="تم بنجاح" message="تم حفظ البيانات." %}
+{% endcomment %}
+<div class="alert alert-{{ type|default:'info' }}" role="alert">
+  <div class="alert-icon">
+    {% if type == 'success' %}
+      <i class="bi bi-check-circle-fill"></i>
+    {% elif type == 'danger' or type == 'error' %}
+      <i class="bi bi-exclamation-octagon-fill"></i>
+    {% elif type == 'warning' %}
+      <i class="bi bi-exclamation-triangle-fill"></i>
+    {% else %}
+      <i class="bi bi-info-circle-fill"></i>
+    {% endif %}
+  </div>
+  <div class="alert-content">
+    {% if title %}
+      <div class="alert-title">{{ title }}</div>
+    {% endif %}
+    <div>{{ message }}</div>
+  </div>
+  <button type="button" class="alert-close" aria-label="إغلاق التنبيه">
+    <i class="bi bi-x-lg"></i>
+  </button>
+</div>

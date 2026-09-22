@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}لوحة تحكم الطالب - منصة التعليم الجامعية{% endblock %}
+
+{% block breadcrumb %}
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <span class="page-breadcrumb-item active">لوحة تحكم الطالب</span>
+{% endblock %}
+
+{% block content %}
+  <!-- Student Dashboard Header -->
+  <div class="page-header">
+    <div class="page-title-group">
+      <h1 class="page-title">مرحبًا، {{ user.get_full_name|default:user.username }}</h1>
+      <p class="page-subtitle">نتمنى لك رحلة تعليمية موفقة وناجحة في فترك الأكاديمي.</p>
+    </div>
+    <div class="page-actions">
+
+    </div>
+  </div>
+
+  <!-- Student Simple Academic Stats -->
+  <div class="grid grid-cols-2 mb-4">
+    {% include "components/stat_card.html" with title="مقرراتي المسجلة" value=my_courses_count|default:enrolled_courses.count|default:'0' icon="bi-journal-bookmark-fill" color_class="primary" %}
+    {% include "components/stat_card.html" with title="طلبات قيد الانتظار" value=pending_requests_count|default:'0' icon="bi-hourglass-split" color_class="warning" %}
+  </div>
+
+  <!-- My Enrolled Courses Section -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h2 style="font-size: var(--font-size-xl); margin: 0;">مقرراتي الدراسية</h2>
+      <p class="text-muted text-small m-0">المقررات التي تم قبول تسجيلك فيها وتتابع محتواها</p>
+    </div>
+    {% if enrolled_courses %}
+      <a href="{% url 'student_my_courses' %}" class="btn btn-ghost btn-sm">
+        <span>عرض الكل</span>
+        <i class="bi bi-arrow-left"></i>
+      </a>
+    {% endif %}
+  </div>
+
+  {% if enrolled_courses %}
+    <div class="grid grid-cols-3">
+      {% for course in enrolled_courses %}
+        {% include "components/course_card.html" with course=course mode="student_enrolled" %}
+      {% endfor %}
+    </div>
+  {% else %}
+    {% include "components/empty_state.html" with icon="bi-journal-x" title="لا توجد مقررات مسجل فيها حاليًا" description="يمكنك تصفح المقررات المتاحة لتخصصك وتقديم طلب تسجيل للبدء في دراستها." action_url="/student/courses/" action_text="تصفح المقررات المتاحة" %}
+  {% endif %}
+
+{% endblock %}

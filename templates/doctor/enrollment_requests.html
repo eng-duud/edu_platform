@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}طلبات التسجيل في المقررات - منصة التعليم الجامعية{% endblock %}
+
+{% block breadcrumb %}
+  <span class="page-breadcrumb-separator"><i class="bi bi-chevron-left"></i></span>
+  <span class="page-breadcrumb-item active">طلبات التسجيل في المقررات</span>
+{% endblock %}
+
+{% block content %}
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title-group">
+      <h1 class="page-title">طلبات التسجيل في المقررات</h1>
+      <p class="page-subtitle">مراجعة طلبات انضمام الطلاب لمقرراتك الدراسية والموافقة عليها أو رفضها.</p>
+    </div>
+  </div>
+
+  <!-- Filter Pills / Tabs -->
+  <div class="d-flex align-items-center gap-2 mb-3" style="flex-wrap: wrap;">
+    <a href="{% url 'doctor_enrollment_requests' %}" class="btn {% if not request.GET.status %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">
+      <span>جميع الطلبات</span>
+    </a>
+    <a href="{% url 'doctor_enrollment_requests' %}?status=pending" class="btn {% if request.GET.status == 'pending' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">
+      <i class="bi bi-hourglass-split"></i>
+      <span>قيد المراجعة</span>
+      {% if pending_count %}
+        <span class="badge badge-warning" style="margin-right: 0.25rem;">{{ pending_count }}</span>
+      {% endif %}
+    </a>
+    <a href="{% url 'doctor_enrollment_requests' %}?status=approved" class="btn {% if request.GET.status == 'approved' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">
+      <i class="bi bi-check-circle"></i>
+      <span>المقبولة</span>
+    </a>
+    <a href="{% url 'doctor_enrollment_requests' %}?status=rejected" class="btn {% if request.GET.status == 'rejected' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">
+      <i class="bi bi-x-circle"></i>
+      <span>المرفوضة</span>
+    </a>
+  </div>
+
+  <!-- Enrollment Table Card -->
+  <div class="card">
+    <div class="card-body" style="padding: 0;">
+      {% if enrollment_requests %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>اسم الطالب</th>
+                <th>الرقم الجامعي</th>
+                <th>المقرر الدراسي</th>
+                <th>تاريخ تقديم الطلب</th>
+                <th>الحالة الأكاديمية</th>
+                <th style="text-align: left;">الإجراءات المتاحة</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for req in enrollment_requests %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <img src="{% static 'core/images/default-avatar.svg' %}" alt="" style="width: 28px; height: 28px; border-radius: var(--radius-full);">
+                      <span style="font-weight: var(--font-weight-medium); color: var(--text-main);">
+                        {{ req.student.user.get_full_name|default:req.student.user.username }}
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <span style="font-family: monospace; font-weight: var(--font-weight-medium); color: var(--text-body);">
+                      {{ req.student.university_id|default:req.student.user.username }}
+                    </span>
+                  </td>
+                  <td>
+                    <strong class="text-main">{{ req.course.name }}</strong>
+                    {% if req.course.level %}
+                      <span class="text-muted text-xs d-block">{{ req.course.level.name|default:req.course.level }}</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-muted text-small">
+                    {{ req.requested_at|date:"d M Y" }}
+                    <span class="text-xs d-block">{{ req.requested_at|time:"H:i" }}</span>
+                  </td>
+                  <td>
+                    {% if req.status == 'pending' %}
+                      <span class="badge badge-warning">
+                        <span class="status-dot"></span> قيد المراجعة
+                      </span>
+                    {% elif req.status == 'approved' %}
+                      <span class="badge badge-success">
+                        <span class="status-dot"></span> مقبول
+                      </span>
+                    {% elif req.status == 'rejected' %}
+                      <span class="badge badge-danger">
+                        <span class="status-dot"></span> مرفوض
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td style="text-align: left;">
+                    {% if req.status == 'pending' %}
+                      <div class="d-flex align-items-center justify-content-end gap-2">
+                        <form method="post" action="{% url 'doctor_enrollment_approve' req.id %}" class="m-0">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-accent btn-sm">
+                            <i class="bi bi-check-lg"></i>
+                            <span>قبول</span>
+                          </button>
+                        </form>
+                        <form method="post" action="{% url 'doctor_enrollment_reject' req.id %}" class="m-0">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-x-lg"></i>
+                            <span>رفض</span>
+                          </button>
+                        </form>
+                      </div>
+                    {% elif req.status == 'approved' %}
+                      <span class="badge badge-success">تمت الموافقة</span>
+                    {% elif req.status == 'rejected' %}
+                      <span class="badge badge-danger">تم الرفض</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        {% include "components/pagination.html" with page_obj=page_obj %}
+
+      {% else %}
+        <div style="padding: 3.5rem 1.5rem; text-align: center;">
+          <div style="width: 56px; height: 56px; border-radius: var(--radius-full); background-color: var(--bg-surface-subtle); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; margin: 0 auto 1rem;">
+            <i class="bi bi-inbox"></i>
+          </div>
+          <h3 style="font-size: var(--font-size-md); font-weight: var(--font-weight-semibold); color: var(--text-main); margin-bottom: 0.35rem;">لا توجد طلبات تسجيل</h3>
+          <p class="text-muted text-small m-0">لم يتم العثور على أي طلبات تسجيل تطابق هذا الفلتر حالياً.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+{% endblock %}
